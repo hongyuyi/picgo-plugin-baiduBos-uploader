@@ -10,6 +10,8 @@ npm install ./picgo-plugin-baiduBos-uploader
 ```
 
 重启picgo即可使用
+# MacOS
+macOS路径: ~/Library/Application\ Support/picgo/
 
 # 插件开发流程
 [传送门](https://blog.csdn.net/Bob_ganxin/article/details/118914430)
