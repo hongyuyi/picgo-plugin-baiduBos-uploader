@@ -43,6 +43,14 @@ const config = (ctx) => {
       required: false
     },
     {
+      name: 'imageProcess',
+      type: 'input',
+      alias: '网址后缀',
+      message: '例如?x-bce-process=style/样式名称',
+      default: userConfig.imageProcess || '',
+      required: false
+    },
+    {
       name: 'customUrl',
       type: 'input',
       alias: '自定义域名',
@@ -65,13 +73,6 @@ const generateSignature = (ctx, userConfig, fileName, date) => {
   const signingKey = crypto_.createHmac('sha256', secretKey).update(authStringPrefix).digest('hex')
   const signature = crypto_.createHmac('sha256', signingKey).update(canonicalRequest).digest('hex')
   const authorization = `bce-auth-v1/${accessKey}/${date}/1800/x-bce-date/${signature}`
-  ctx.log.info(canonicalRequest)
-  ctx.log.info(signingKey)
-  ctx.log.info(authorization)
-  ctx.emit('notification', {
-    title: '上传失败！',
-    body: '请检查你的配置项是否正确'
-  })
   return authorization
 }
 
@@ -82,7 +83,7 @@ const requestConstruct= (userConfig, fileName, signature, img, dateUTC, dateISO)
 
   return {
     method: 'PUT',
-    uri: `http://${host}/v1/${bucketName}/${encodeURI(path)}${encodeURI(fileName)}`,
+    url: `https://${host}/v1/${bucketName}/${encodeURI(path)}${encodeURI(fileName)}`,
     headers: {
       Authorization: signature,
       Date: dateUTC,
@@ -94,10 +95,6 @@ const requestConstruct= (userConfig, fileName, signature, img, dateUTC, dateISO)
 }
 
 const handle = async (ctx) => {
-  ctx.emit('notification', {
-    title: '上传失败！',
-    body: '请检查你的配置项是否正确'
-  })
   const userConfig = ctx.getConfig('picBed.baiduBos-uploader')
   if (!userConfig) {
     throw new Error('未配置参数，请配置百度BOS上传参数')
@@ -106,6 +103,7 @@ const handle = async (ctx) => {
   const host = userConfig.region
   const path = (userConfig.path) ? userConfig.path + '/' : ''
   const customUrl = userConfig.customUrl
+  const imageProcess = userConfig.imageProcess
   let dateISO = new Date().toISOString()
   dateISO = dateISO.slice(0, dateISO.indexOf('.')) + 'Z'
   const dateUTC = new Date().toUTCString()
@@ -125,6 +123,9 @@ const handle = async (ctx) => {
         delete imgList[i].buffer
         const url = (customUrl) ? `${customUrl}/${encodeURI(path)}${encodeURI(imgList[i].fileName)}` : `https://${bucketName}.${host}/${encodeURI(path)}${encodeURI(imgList[i].fileName)}`
         imgList[i]['imgUrl'] = url
+        if (imageProcess) {
+          imgList[i]['imgUrl'] += imageProcess
+        }
       } else {
         throw new Error('Upload failed')
       }
@@ -134,12 +135,12 @@ const handle = async (ctx) => {
     if (err.error === 'Upload failed') {
       ctx.emit('notification', {
         title: '上传失败！',
-        body: '请检查你的配置项是否正确'
+        body: '请检查你的配置项是否正确3'
       })
     } else {
       ctx.emit('notification', {
         title: '上传失败！',
-        body: '请检查你的配置项是否正确'
+        body: '请检查你的配置项是否正确4'
       })
     }
     throw err
