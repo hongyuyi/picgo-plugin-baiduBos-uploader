@@ -13,3 +13,7 @@ npm install ./picgo-plugin-baiduBos-uploader
 
 # 插件开发流程
 [传送门](https://blog.csdn.net/Bob_ganxin/article/details/118914430)
+
+# 更新内容
+在原作者基础上，修改支持了https，以及兼容链接。
+增加后缀链接功能。
