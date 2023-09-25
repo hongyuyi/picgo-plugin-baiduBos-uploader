@@ -16,4 +16,4 @@ npm install ./picgo-plugin-baiduBos-uploader
 
 # 更新内容
 在原作者基础上，修改支持了https，以及兼容链接。
-增加后缀链接功能。
+增加网址后缀功能。
